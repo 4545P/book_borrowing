@@ -8,6 +8,8 @@ public class InventoryRequest {
 
     public String isbn;
 
+    public String name;
+
     public LocalDateTime store;
 
     public String status;
@@ -45,5 +47,13 @@ public class InventoryRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

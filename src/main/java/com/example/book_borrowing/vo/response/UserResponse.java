@@ -1,9 +1,10 @@
 package com.example.book_borrowing.vo.response;
 
 import com.example.book_borrowing.entity.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
 
     public List<User> userList;
@@ -25,10 +26,11 @@ public class UserResponse {
         this.message = message;
     }
 
-    public UserResponse(Integer userId, String phone, String name) {
+    public UserResponse(Integer userId, String phone, String name, String message) {
         this.userId = userId;
         this.phone = phone;
         this.name = name;
+        this.message = message;
     }
 
     public List<User> getUserList() {

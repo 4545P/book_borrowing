@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @CrossOrigin
 @RestController
 public class UserController {
@@ -17,12 +19,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/user/add")
+    @PostMapping("/api/user/add")
     public UserResponse addUser(@RequestBody User user) {
         return  userService.addUser(user);
     }
 
-    @PostMapping("/user/isValid")
+    @PostMapping("/api/user/isValid")
     public UserResponse isValidUser(@RequestBody UserRequest userRequest) {
         return  userService.isValidUser(userRequest.getPhone(), userRequest.getPassword());
     }

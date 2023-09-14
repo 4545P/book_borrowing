@@ -20,6 +20,9 @@ public class Inventory {
     @Column(name = "isbn")
     private String isbn;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "store")
     private LocalDateTime store;
 
@@ -29,9 +32,10 @@ public class Inventory {
     public Inventory() {
     }
 
-    public Inventory(Integer inventoryId, String isbn, LocalDateTime store, String status) {
+    public Inventory(Integer inventoryId, String isbn, String name, LocalDateTime store, String status) {
         this.inventoryId = inventoryId;
         this.isbn = isbn;
+        this.name = name;
         this.store = store;
         this.status = status;
     }
@@ -66,5 +70,13 @@ public class Inventory {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

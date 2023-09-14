@@ -25,6 +25,7 @@ dependencies {
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     implementation 'javax.persistence:javax.persistence-api:2.2'
 
+
     //資料庫
     implementation 'mysql:mysql-connector-java:8.0.31'
     implementation 'org.springframework.boot:spring-boot-starter-web'
