@@ -22,7 +22,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.fasterxml.jackson.core:jackson-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+//    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     implementation 'javax.persistence:javax.persistence-api:2.2'
 
 
