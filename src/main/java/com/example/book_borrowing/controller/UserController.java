@@ -47,5 +47,4 @@ public class UserController {
   public UserResponse isValidUser(@RequestBody UserRequest userRequest) {
     return  userService.isValidUser(userRequest.getPhone(), userRequest.getPassword());
   }
-
 }

@@ -84,5 +84,4 @@ public class UserResponse {
   public void setName(String name) {
     this.name = name;
   }
-
 }

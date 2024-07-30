@@ -19,5 +19,4 @@ public interface InventoryDao extends JpaRepository<Inventory, Integer> {
    * @return 符合條件的庫存信息列表
    */
   List<Inventory> findAllByNameContainingIgnoreCase(String name);
-
 }

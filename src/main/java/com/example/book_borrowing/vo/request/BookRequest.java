@@ -49,5 +49,4 @@ public class BookRequest {
   public void setIntroduction(String introduction) {
     this.introduction = introduction;
   }
-
 }

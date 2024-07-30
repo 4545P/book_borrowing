@@ -71,5 +71,4 @@ public class UserRequest {
   public void setLastLogin(LocalDateTime lastLogin) {
     this.lastLogin = lastLogin;
   }
-
 }

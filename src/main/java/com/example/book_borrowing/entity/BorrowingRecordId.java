@@ -47,5 +47,4 @@ public class BorrowingRecordId implements Serializable {
   public void setInventoryId(Integer inventoryId) {
     this.inventoryId = inventoryId;
   }
-
 }

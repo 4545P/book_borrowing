@@ -45,5 +45,4 @@ public class BookResponse {
   public void setMessage(String message) {
     this.message = message;
   }
-
 }

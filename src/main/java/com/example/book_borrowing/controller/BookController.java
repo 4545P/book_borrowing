@@ -116,5 +116,4 @@ public class BookController {
   public BookResponse scrap(@RequestBody BorrowingRecordRequest borrowingRecordRequest) {
     return  bookService.scrap(borrowingRecordRequest.getInventoryId());
   }
-
 }

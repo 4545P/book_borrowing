@@ -100,7 +100,10 @@ public class BookServiceImpl implements BookService {
   @Override
   @Transactional
   public BookResponse addBook(Book book) {
-    if (book.getIsbn().isBlank() || book.getName().isBlank() || book.getAuthor().isBlank() || book.getIntroduction().isBlank()) {
+    if (book.getIsbn().isBlank()
+        || book.getName().isBlank()
+        || book.getAuthor().isBlank()
+        || book.getIntroduction().isBlank()) {
       return new BookResponse(Collections.singletonList(book), "新增書籍失敗");
     } else {
       Inventory inventory = new Inventory();
@@ -206,5 +209,4 @@ public class BookServiceImpl implements BookService {
       return new BookResponse("未找到該庫存");
     }
   }
-
 }

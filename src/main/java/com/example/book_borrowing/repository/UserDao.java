@@ -18,5 +18,4 @@ public interface UserDao extends JpaRepository<User, String> {
    * @return 符合條件的用戶，如果找不到則返回 null
    */
   User findByPhone(String phone);
-
 }
