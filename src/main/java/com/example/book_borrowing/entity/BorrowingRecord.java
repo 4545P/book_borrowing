@@ -67,5 +67,4 @@ public class BorrowingRecord {
   public void setReturnTime(LocalDateTime returnTime) {
     this.returnTime = returnTime;
   }
-
 }
