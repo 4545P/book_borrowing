@@ -1,5 +1,6 @@
 package com.example.book_borrowing.service.impl;
 
+import com.example.book_borrowing.constants.WidgetApiRtnCode;
 import com.example.book_borrowing.entity.Book;
 import com.example.book_borrowing.entity.BorrowingRecord;
 import com.example.book_borrowing.entity.BorrowingRecordId;
@@ -30,38 +31,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Service
 public class BookServiceImpl implements BookService {
 
-  BookDao bookDao;
+  private final BookDao bookDao;
 
-  Inventory inventory;
+  private final InventoryDao inventoryDao;
 
-  InventoryDao inventoryDao;
-
-  BorrowingRecord borrowingRecord;
-
-  BorrowingRecordDao borrowingRecordDao;
+  private final BorrowingRecordDao borrowingRecordDao;
 
   @Autowired
-  public void setBookDao(BookDao bookDao) {
+  public BookServiceImpl(
+      BookDao bookDao, InventoryDao inventoryDao, BorrowingRecordDao borrowingRecordDao) {
     this.bookDao = bookDao;
-  }
-
-  @Autowired
-  public void setInventory(Inventory inventory) {
-    this.inventory = inventory;
-  }
-
-  @Autowired
-  public void setInventoryDao(InventoryDao inventoryDao) {
     this.inventoryDao = inventoryDao;
-  }
-
-  @Autowired
-  public void setBorrowingRecord(BorrowingRecord borrowingRecord) {
-    this.borrowingRecord = borrowingRecord;
-  }
-
-  @Autowired
-  public void setBorrowingRecordDao(BorrowingRecordDao borrowingRecordDao) {
     this.borrowingRecordDao = borrowingRecordDao;
   }
 
@@ -75,7 +55,8 @@ public class BookServiceImpl implements BookService {
       // 如果沒有參數則返回全部
       inventoryList = inventoryDao.findAll();
     }
-    totalElements = inventoryList.size(); // 計算總數
+    // 計算總數
+    totalElements = inventoryList.size();
     List<Map<String, Object>> resultList = getMapInventory(inventoryList);
     Map<String, Object> result = new HashMap<>();
     result.put("list", resultList);
@@ -96,7 +77,6 @@ public class BookServiceImpl implements BookService {
     return responses;
   }
 
-
   @Override
   @Transactional
   public BookResponse addBook(Book book) {
@@ -104,7 +84,7 @@ public class BookServiceImpl implements BookService {
         || book.getName().isBlank()
         || book.getAuthor().isBlank()
         || book.getIntroduction().isBlank()) {
-      return new BookResponse(Collections.singletonList(book), "新增書籍失敗");
+      return new BookResponse(Collections.singletonList(book), WidgetApiRtnCode.PARANETER_REQUIRE.getMessage());
     } else {
       Inventory inventory = new Inventory();
       inventory.setIsbn(book.getIsbn());
@@ -115,90 +95,94 @@ public class BookServiceImpl implements BookService {
       inventoryDao.save(inventory);
     }
     bookDao.save(book);
-    return new BookResponse(Collections.singletonList(book), "新增書籍成功");
+    return new BookResponse(Collections.singletonList(book), WidgetApiRtnCode.SUCCESSFUL.getMessage());
   }
 
   @Override
   @Transactional
   public BookResponse borrowingBook(Integer userId, Integer inventoryId) {
     if (userId == null || inventoryId == null) {
-      return new BookResponse("借閱失敗");
+      return new BookResponse(WidgetApiRtnCode.FAILED.getMessage());
     }
     Optional<Inventory> inventoryOptional = inventoryDao.findById(inventoryId);
     if (inventoryOptional.isEmpty()) {
-      return new BookResponse("找不到該庫存");
+      return new BookResponse(WidgetApiRtnCode.NOT_FOUND.getMessage());
     }
     Inventory inventory = inventoryOptional.get();
     if (!inventory.getStatus().equals("在庫")) {
-      return new BookResponse("書籍不可借閱");
+      return new BookResponse(WidgetApiRtnCode.BORROW_FAIL.getMessage());
     }
     BorrowingRecord borrowingRecord = new BorrowingRecord();
-    BorrowingRecordId id = new BorrowingRecordId();
-    id.setUserId(userId);
-    id.setInventoryId(inventoryId);
+    BorrowingRecordId id = new BorrowingRecordId(userId, inventoryId);
     borrowingRecord.setId(id);
     borrowingRecord.setBorrowingTime(LocalDateTime.now());
     borrowingRecord.setReturnTime(null);
     borrowingRecordDao.save(borrowingRecord);
     inventory.setStatus("出借中");
     inventoryDao.save(inventory);
-    return new BookResponse("借閱成功");
+    return new BookResponse(WidgetApiRtnCode.BORROW_SUCCESS.getMessage());
   }
 
   @Override
   @Transactional
   public BookResponse returnBook(Integer userId, Integer inventoryId) {
     if (userId == null || inventoryId == null) {
-      return new BookResponse("還書失敗");
+      return new BookResponse(WidgetApiRtnCode.FAILED.getMessage());
     }
     Optional<BorrowingRecord> borrowingRecordOptional = borrowingRecordDao.findById(new BorrowingRecordId(userId, inventoryId));
     if (borrowingRecordOptional.isEmpty()) {
-      return new BookResponse("沒有借閱紀錄");
+      return new BookResponse(WidgetApiRtnCode.NO_RECORD.getMessage());
     }
     BorrowingRecord borrowingRecord = borrowingRecordOptional.get();
     borrowingRecord.setReturnTime(LocalDateTime.now());
     Optional<Inventory> inventoryOptional = inventoryDao.findById(inventoryId);
     if (inventoryOptional.isEmpty()) {
-      return new BookResponse("找不到該庫存");
+      return new BookResponse(WidgetApiRtnCode.NOT_FOUND.getMessage());
     }
     Inventory inventory = inventoryOptional.get();
     inventory.setStatus("整理中");
     inventoryDao.save(inventory);
-    return new BookResponse("還書成功");
+    return new BookResponse(WidgetApiRtnCode.RETURN_SUCCESS.getMessage());
   }
 
   @Override
-  public BookResponse stock(Integer inventoryId) {
+  public BookResponse stock(Integer userId, Integer inventoryId) {
+    if (userId == null || inventoryId == null) {
+      return new BookResponse(WidgetApiRtnCode.FAILED.getMessage());
+    }
     Optional<Inventory> inventoryOptional = inventoryDao.findById(inventoryId);
     if (inventoryOptional.isPresent()) {
       Inventory inventory = inventoryOptional.get();
       if (!inventory.getStatus().equals("整理中")) {
-        return new BookResponse("書籍不可操作");
+        return new BookResponse(WidgetApiRtnCode.UPDATE_FAIL.getMessage());
       }
       inventory.setStatus("在庫");
       inventoryDao.save(inventory);
-      return new BookResponse("在庫");
+      return new BookResponse(WidgetApiRtnCode.STOCK.getMessage());
     } else {
-      return new BookResponse("找不到該庫存");
+      return new BookResponse(WidgetApiRtnCode.NOT_FOUND.getMessage());
     }
   }
 
   @Override
-  public BookResponse lost(Integer inventoryId) {
-    return updateInventoryStatus(inventoryId, "遺失");
+  public BookResponse lost(Integer userId, Integer inventoryId) {
+    return updateInventoryStatus(userId, inventoryId, "遺失");
   }
 
   @Override
-  public BookResponse damaged(Integer inventoryId) {
-    return updateInventoryStatus(inventoryId, "損毀");
+  public BookResponse damaged(Integer userId, Integer inventoryId) {
+    return updateInventoryStatus(userId, inventoryId, "損毀");
   }
 
   @Override
-  public BookResponse scrap(Integer inventoryId) {
-    return updateInventoryStatus(inventoryId, "報廢");
+  public BookResponse scrap(Integer userId, Integer inventoryId) {
+    return updateInventoryStatus(userId, inventoryId, "報廢");
   }
 
-  private BookResponse updateInventoryStatus(Integer inventoryId, String status) {
+  private BookResponse updateInventoryStatus(Integer userId, Integer inventoryId, String status) {
+    if (userId == null || inventoryId == null) {
+      return new BookResponse(WidgetApiRtnCode.FAILED.getMessage());
+    }
     Optional<Inventory> inventoryOptional = inventoryDao.findById(inventoryId);
     if (inventoryOptional.isPresent()) {
       Inventory inventory = inventoryOptional.get();
@@ -206,7 +190,7 @@ public class BookServiceImpl implements BookService {
       inventoryDao.save(inventory);
       return new BookResponse(status);
     } else {
-      return new BookResponse("未找到該庫存");
+      return new BookResponse(WidgetApiRtnCode.NOT_FOUND.getMessage());
     }
   }
 }

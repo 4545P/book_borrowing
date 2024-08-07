@@ -81,7 +81,7 @@ public class BookController {
    */
   @PostMapping("/api/book/stock")
   public BookResponse stock(@RequestBody BorrowingRecordRequest borrowingRecordRequest) {
-    return  bookService.stock(borrowingRecordRequest.getInventoryId());
+    return  bookService.stock(borrowingRecordRequest.getUserId(), borrowingRecordRequest.getInventoryId());
   }
 
   /**
@@ -92,7 +92,7 @@ public class BookController {
    */
   @PostMapping("/api/book/lost")
   public BookResponse lost(@RequestBody BorrowingRecordRequest borrowingRecordRequest) {
-    return  bookService.lost(borrowingRecordRequest.getInventoryId());
+    return  bookService.lost(borrowingRecordRequest.getUserId(), borrowingRecordRequest.getInventoryId());
   }
 
   /**
@@ -103,7 +103,7 @@ public class BookController {
    */
   @PostMapping("/api/book/damaged")
   public BookResponse damaged(@RequestBody BorrowingRecordRequest borrowingRecordRequest) {
-    return  bookService.damaged(borrowingRecordRequest.getInventoryId());
+    return  bookService.damaged(borrowingRecordRequest.getUserId(), borrowingRecordRequest.getInventoryId());
   }
 
   /**
@@ -114,6 +114,6 @@ public class BookController {
    */
   @PostMapping("/api/book/scrap")
   public BookResponse scrap(@RequestBody BorrowingRecordRequest borrowingRecordRequest) {
-    return  bookService.scrap(borrowingRecordRequest.getInventoryId());
+    return  bookService.scrap(borrowingRecordRequest.getUserId(), borrowingRecordRequest.getInventoryId());
   }
 }

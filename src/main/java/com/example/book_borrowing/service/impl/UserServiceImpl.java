@@ -1,5 +1,6 @@
 package com.example.book_borrowing.service.impl;
 
+import com.example.book_borrowing.constants.WidgetApiRtnCode;
 import com.example.book_borrowing.entity.User;
 import com.example.book_borrowing.repository.UserDao;
 import com.example.book_borrowing.service.ifs.UserService;
@@ -9,6 +10,8 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
@@ -21,12 +24,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-  UserDao userDao;
+  private final UserDao userDao;
 
   @Autowired
-  public void setUserDao(UserDao userDao) {
+  public UserServiceImpl(UserDao userDao) {
     this.userDao = userDao;
   }
+
+  private static final String PHONE_PATTERN = "^09\\d{8}$";
 
   /**
    * 將使用者註冊到系統中，如果必要的用戶資訊不完整，返回註冊失敗的回應.
@@ -36,8 +41,11 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public UserResponse addUser(User user) {
-    if (user.getPhone().isBlank() || user.getPassword().isBlank() || user.getName().isBlank()) {
-      return new UserResponse(Collections.singletonList(user), "註冊失敗");
+    if (!user.getPhone().matches(PHONE_PATTERN)) {
+      return new UserResponse(Collections.singletonList(user), WidgetApiRtnCode.PHONE_ERROR.getMessage());
+    }
+    if (user.getName().isBlank() || user.getPassword().isBlank()) {
+      return new UserResponse(Collections.singletonList(user), WidgetApiRtnCode.PARANETER_REQUIRE.getMessage());
     } else {
       LocalDateTime registerTime = LocalDateTime.now();
       user.setRegistration(registerTime);
@@ -45,7 +53,7 @@ public class UserServiceImpl implements UserService {
       user.setPassword(hashedPassword);
     }
     userDao.save(user);
-    return new UserResponse(Collections.singletonList(user), "註冊成功");
+    return new UserResponse(Collections.singletonList(user), WidgetApiRtnCode.SUCCESSFUL.getMessage());
   }
 
   /**
@@ -64,10 +72,10 @@ public class UserServiceImpl implements UserService {
         LocalDateTime lastLoginTime = LocalDateTime.now();
         user.setLastLogin(lastLoginTime);
         userDao.save(user);
-        return new UserResponse(user.getUserId(), user.getPhone(), user.getName(), "登入成功");
+        return new UserResponse(user.getUserId(), user.getPhone(), user.getName(), WidgetApiRtnCode.SUCCESSFUL.getMessage());
       }
     }
-    return new UserResponse("登入失敗");
+    return new UserResponse(WidgetApiRtnCode.FAILED.getMessage());
   }
 
   /**
@@ -89,12 +97,14 @@ public class UserServiceImpl implements UserService {
    * @param password 要雜湊的密碼
    * @return 雜湊後的密碼字串
    */
-  private  String hashPassword(String password) {
+  private String hashPassword(String password) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
       byte[] hashBytes = digest.digest(password.getBytes());
       return Base64.getEncoder().encodeToString(hashBytes);
     } catch (NoSuchAlgorithmException e) {
+      Logger logger = (Logger) LoggerFactory.getLogger(UserServiceImpl.class);
+      logger.info("Password hashing failed");
       e.printStackTrace();
       return null;
     }

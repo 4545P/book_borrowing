@@ -18,11 +18,11 @@ public interface BookService {
 
   BookResponse returnBook(Integer userId, Integer inventoryId);
 
-  BookResponse stock(Integer inventoryId);
+  BookResponse stock(Integer userId, Integer inventoryId);
 
-  BookResponse lost(Integer inventoryId);
+  BookResponse lost(Integer userId, Integer inventoryId);
 
-  BookResponse damaged(Integer inventoryId);
+  BookResponse damaged(Integer userId, Integer inventoryId);
 
-  BookResponse scrap(Integer inventoryId);
+  BookResponse scrap(Integer userId, Integer inventoryId);
 }
