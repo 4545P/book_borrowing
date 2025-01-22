@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Entity
-@Table(name = "Inventory")
+@Table(name = "inventory")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Inventory {
 

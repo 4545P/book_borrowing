@@ -1,6 +1,6 @@
 package com.example.book_borrowing.vo.response;
 
-import com.example.book_borrowing.entity.User;
+import com.example.book_borrowing.entity.Users;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
@@ -9,9 +9,9 @@ import java.util.List;
  * 表示用戶響應的類，用於返回用戶列表和用戶相關信息
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserResponse {
+public class UsersResponse {
 
-  public List<User> userList;
+  public List<Users> userList;
 
   public String message;
 
@@ -21,11 +21,11 @@ public class UserResponse {
 
   public String name;
 
-  public UserResponse(String message) {
+  public UsersResponse(String message) {
     this.message = message;
   }
 
-  public UserResponse(List<User> userList, String message) {
+  public UsersResponse(List<Users> userList, String message) {
     this.userList = userList;
     this.message = message;
   }
@@ -38,18 +38,21 @@ public class UserResponse {
    * @param name 用戶名
    * @param message 響應消息
    */
-  public UserResponse(Integer userId, String phone, String name, String message) {
+  public UsersResponse(Integer userId, String phone, String name, String message) {
     this.userId = userId;
     this.phone = phone;
     this.name = name;
     this.message = message;
   }
 
-  public List<User> getUserList() {
+  public UsersResponse(Integer userId, String name, String message) {
+  }
+
+  public List<Users> getUserList() {
     return userList;
   }
 
-  public void setUserList(List<User> userList) {
+  public void setUserList(List<Users> userList) {
     this.userList = userList;
   }
 

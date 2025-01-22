@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
  * JI.
  * 表示用戶請求的類，用於接收用戶相關的請求數據
  */
-public class UserRequest {
+public class UsersRequest {
 
   public Integer userId;
 
@@ -20,7 +20,7 @@ public class UserRequest {
 
   public LocalDateTime lastLogin;
 
-  public UserRequest() {
+  public UsersRequest() {
 
   }
 

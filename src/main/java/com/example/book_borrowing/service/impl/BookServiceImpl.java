@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * JI.
  * 接口的實現類，提供與書籍相關的操作功能
+ * @author blue
  */
 @EnableScheduling
 @Service
@@ -80,21 +81,26 @@ public class BookServiceImpl implements BookService {
   @Override
   @Transactional
   public BookResponse addBook(Book book) {
+    // 驗證輸入參數是否有效
     if (book.getIsbn().isBlank()
-        || book.getName().isBlank()
-        || book.getAuthor().isBlank()
-        || book.getIntroduction().isBlank()) {
+      || book.getName().isBlank()
+      || book.getAuthor().isBlank()
+      || book.getIntroduction().isBlank()) {
       return new BookResponse(Collections.singletonList(book), WidgetApiRtnCode.PARANETER_REQUIRE.getMessage());
     } else {
+      // 保存書籍資料到 book 表
+      bookDao.save(book);
+
+      // 創建並保存對應的 inventory 資料
       Inventory inventory = new Inventory();
       inventory.setIsbn(book.getIsbn());
       inventory.setName(book.getName());
       LocalDateTime storeTime = LocalDateTime.now();
       inventory.setStore(storeTime);
-      inventory.setStatus("在庫");
+      inventory.setStatus(WidgetApiRtnCode.STOCK.getMessage());
       inventoryDao.save(inventory);
     }
-    bookDao.save(book);
+    // 返回成功的響應
     return new BookResponse(Collections.singletonList(book), WidgetApiRtnCode.SUCCESSFUL.getMessage());
   }
 
@@ -109,7 +115,7 @@ public class BookServiceImpl implements BookService {
       return new BookResponse(WidgetApiRtnCode.NOT_FOUND.getMessage());
     }
     Inventory inventory = inventoryOptional.get();
-    if (!inventory.getStatus().equals("在庫")) {
+    if (!WidgetApiRtnCode.STOCK.getMessage().equals(inventory.getStatus())) {
       return new BookResponse(WidgetApiRtnCode.BORROW_FAIL.getMessage());
     }
     BorrowingRecord borrowingRecord = new BorrowingRecord();
@@ -118,7 +124,7 @@ public class BookServiceImpl implements BookService {
     borrowingRecord.setBorrowingTime(LocalDateTime.now());
     borrowingRecord.setReturnTime(null);
     borrowingRecordDao.save(borrowingRecord);
-    inventory.setStatus("出借中");
+    inventory.setStatus(WidgetApiRtnCode.BORROWED.getMessage());
     inventoryDao.save(inventory);
     return new BookResponse(WidgetApiRtnCode.BORROW_SUCCESS.getMessage());
   }
@@ -140,7 +146,10 @@ public class BookServiceImpl implements BookService {
       return new BookResponse(WidgetApiRtnCode.NOT_FOUND.getMessage());
     }
     Inventory inventory = inventoryOptional.get();
-    inventory.setStatus("整理中");
+    if (!WidgetApiRtnCode.BORROWED.getMessage().equals(inventory.getStatus())) {
+      return new BookResponse(WidgetApiRtnCode.RETURN_FAIL.getMessage());
+    }
+    inventory.setStatus(WidgetApiRtnCode.IN_ORGANIZATION.getMessage());
     inventoryDao.save(inventory);
     return new BookResponse(WidgetApiRtnCode.RETURN_SUCCESS.getMessage());
   }
@@ -153,12 +162,12 @@ public class BookServiceImpl implements BookService {
     Optional<Inventory> inventoryOptional = inventoryDao.findById(inventoryId);
     if (inventoryOptional.isPresent()) {
       Inventory inventory = inventoryOptional.get();
-      if (!inventory.getStatus().equals("整理中")) {
+      if (!WidgetApiRtnCode.IN_ORGANIZATION.getMessage().equals(inventory.getStatus()) || !WidgetApiRtnCode.LOST.getMessage().equals(inventory.getStatus())) {
         return new BookResponse(WidgetApiRtnCode.UPDATE_FAIL.getMessage());
       }
-      inventory.setStatus("在庫");
+      inventory.setStatus(WidgetApiRtnCode.STOCK.getMessage());
       inventoryDao.save(inventory);
-      return new BookResponse(WidgetApiRtnCode.STOCK.getMessage());
+      return new BookResponse(WidgetApiRtnCode.STOCK_IN.getMessage());
     } else {
       return new BookResponse(WidgetApiRtnCode.NOT_FOUND.getMessage());
     }

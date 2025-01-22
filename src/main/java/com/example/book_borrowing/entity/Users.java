@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Entity
-@Table(name = "User")
+@Table(name = "users")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class User {
+public class Users {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +42,7 @@ public class User {
   @Column(name = "last_login")
   private LocalDateTime lastLogin;
 
-  public User() {
+  public Users() {
 
   }
 
@@ -56,7 +56,7 @@ public class User {
    * @param registration 註冊時間
    * @param lastLogin 最後登錄時間
    */
-  public User(Integer userId, String phone, String name, String password, LocalDateTime registration, LocalDateTime lastLogin) {
+  public Users(Integer userId, String phone, String name, String password, LocalDateTime registration, LocalDateTime lastLogin) {
     this.userId = userId;
     this.phone = phone;
     this.name = name;

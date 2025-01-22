@@ -1,9 +1,9 @@
 package com.example.book_borrowing.controller;
 
-import com.example.book_borrowing.entity.User;
-import com.example.book_borrowing.service.ifs.UserService;
-import com.example.book_borrowing.vo.request.UserRequest;
-import com.example.book_borrowing.vo.response.UserResponse;
+import com.example.book_borrowing.entity.Users;
+import com.example.book_borrowing.service.ifs.UsersService;
+import com.example.book_borrowing.vo.request.UsersRequest;
+import com.example.book_borrowing.vo.response.UsersResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin
 @RestController
-public class UserController {
+public class UsersController {
 
-  private UserService userService;
+  private UsersService userService;
 
   @Autowired
-  public void setUserService(UserService userService) {
+  public void setUserService(UsersService userService) {
     this.userService = userService;
   }
 
@@ -33,7 +33,7 @@ public class UserController {
    * @return 返回包含用戶添加結果的響應對象
    */
   @PostMapping("/api/user/add")
-  public UserResponse addUser(@RequestBody User user) {
+  public UsersResponse addUser(@RequestBody Users user) {
     return  userService.addUser(user);
   }
 
@@ -44,7 +44,7 @@ public class UserController {
    * @return 返回包含用戶驗證結果的響應對象
    */
   @PostMapping("/api/user/isValid")
-  public UserResponse isValidUser(@RequestBody UserRequest userRequest) {
-    return  userService.isValidUser(userRequest.getPhone(), userRequest.getPassword());
+  public UsersResponse isValidUser(@RequestBody UsersRequest userRequest) {
+    return  userService.isValidUser(userRequest.getName(), userRequest.getPassword());
   }
 }
